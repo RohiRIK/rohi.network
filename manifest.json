@@ -1,0 +1,23 @@
+{
+  "schemaVersion": 1,
+  "id": "rohi.network",
+  "name": "My Network",
+  "version": "0.2.0",
+  "author": "RohiRIK",
+  "description": "Wi-Fi and connection state, with a public IPv4 lookup and in-panel IP settings.",
+  "kinds": [
+    "bar-widget"
+  ],
+  "entryPoints": {
+    "barWidget": "Panel.qml"
+  },
+  "barWidget": {
+    "displayName": "My Network",
+    "description": "Wi-Fi list and connection state, plus a public IPv4 lookup and an IP settings editor.",
+    "category": "Network",
+    "allowMultiple": false
+  },
+  "omarchy": {
+    "clonedFrom": "omarchy.network"
+  }
+}

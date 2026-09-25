@@ -1,0 +1,41 @@
+name: test
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  unit:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Model.js unit tests
+        run: node test/model.test.js
+      - name: settings.py validation tests
+        run: python3 test/settings.test.py
+      - name: Manifest contract
+        # validate needs omarchy, which the runner does not have; the schema
+        # and entry-point checks still run.
+        run: python3 test/manifest.test.py -k 'not omarchy_plugin_validate'
+
+  # NetworkManager and omarchy-network-band only exist on a real desktop, so
+  # these run on self-hosted hardware rather than in CI.
+  integration:
+    runs-on: [self-hosted, linux]
+    if: github.repository_owner == 'RohiRIK'
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - name: Integration against NetworkManager
+        run: node test/integration.test.js
+      - name: Manifest and shell contract
+        run: python3 test/manifest.test.py
