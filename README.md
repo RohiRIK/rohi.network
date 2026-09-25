@@ -66,8 +66,29 @@ bash test/run
 | `test/manifest.test.py` | Manifest schema, entry point, and that the files `Panel.qml` shells out to exist |
 | `test/integration.test.js` | Real `nmcli` and `omarchy-network-band` output on this machine |
 
-The last one needs a desktop session, so it runs on a self-hosted runner
-rather than in GitHub Actions. The rest run anywhere.
+## CI, and why the runner is narrow
+
+`test/integration.test.js` needs NetworkManager and `omarchy-network-band`,
+which exist only on a real desktop, so it runs on a self-hosted runner
+registered against this repository.
+
+That runner is Rohi's actual desktop: it holds SSH keys, a logged-in
+browser and the credential-vault plugin. So the grant is kept as narrow as
+it can be while still working:
+
+- **Ephemeral.** The runner accepts exactly one job, then deregisters
+  itself. A standing listener would accept a job from any workflow in the
+  repository at any time.
+- **One label.** It is addressed as `rohi-desktop`, so no other
+  repository's workflow can target it.
+- **Push only.** `test.yml` triggers on pushes to `main` and is the only
+  workflow containing a self-hosted job. Pull requests — including
+  anyone's forks — run in `untrusted.yml`, on `ubuntu-latest` only, with
+  `permissions: contents: read`. It never uses `pull_request_target`.
+
+Changes arriving by pull request are therefore reviewed and landed before
+anything touches the desktop. The equivalent checks pass locally in
+`bash test/run`, so the local run is the fast path and CI is the record.
 
 ## Relationship to `omarchy.network`
 
