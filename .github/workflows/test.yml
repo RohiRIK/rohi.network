@@ -26,7 +26,9 @@ jobs:
         run: python3 test/manifest.test.py -k 'not omarchy_plugin_validate'
 
   # NetworkManager and omarchy-network-band only exist on a real desktop, so
-  # these run on self-hosted hardware rather than in CI.
+  # these run on self-hosted hardware. Until a runner is registered for this
+  # repo the job sits queued; it is not required for a merge, because the
+  # same checks pass locally in `bash test/run`.
   integration:
     runs-on: [self-hosted, linux]
     if: github.repository_owner == 'RohiRIK'
