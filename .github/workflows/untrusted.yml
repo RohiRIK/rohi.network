@@ -1,0 +1,29 @@
+name: untrusted
+
+# Pull requests from forks run here and nowhere else. This workflow has no
+# self-hosted runner in it, and it never uses `pull_request_target`, so a fork
+# cannot reach Rohi's desktop. It only reads the checkout.
+on:
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  unit:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Model.js unit tests
+        run: node test/model.test.js
+      - name: settings.py validation tests
+        run: python3 test/settings.test.py
+      - name: Manifest contract
+        run: python3 test/manifest.test.py -k 'not omarchy_plugin_validate'

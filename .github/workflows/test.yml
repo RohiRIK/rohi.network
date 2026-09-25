@@ -3,7 +3,15 @@ name: test
 on:
   push:
     branches: [main]
-  pull_request:
+
+# No `pull_request` trigger here. The integration job below runs on a
+# self-hosted runner, which is Rohi's actual desktop: it holds SSH keys, a
+# logged-in browser and the credential-vault plugin. A `pull_request` trigger
+# would let anyone who forks this public repo execute code there. Changes
+# arriving by PR are reviewed and landed first; only `main` is trusted.
+#
+# Untrusted PRs are covered by `untrusted.yml`, which has no self-hosted
+# runner in it and only reads the checkout.
 
 jobs:
   unit:
@@ -26,12 +34,11 @@ jobs:
         run: python3 test/manifest.test.py -k 'not omarchy_plugin_validate'
 
   # NetworkManager and omarchy-network-band only exist on a real desktop, so
-  # these run on self-hosted hardware. Until a runner is registered for this
-  # repo the job sits queued; it is not required for a merge, because the
-  # same checks pass locally in `bash test/run`.
+  # these run on self-hosted hardware. This job reads the host's network state
+  # and never modifies a connection. The runner label is specific so it can be
+  # withheld from any other repository's workflow.
   integration:
-    runs-on: [self-hosted, linux]
-    if: github.repository_owner == 'RohiRIK'
+    runs-on: [self-hosted, linux, rohi-desktop]
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
