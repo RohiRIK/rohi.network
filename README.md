@@ -3,6 +3,18 @@
 A clone of Omarchy's `omarchy.network` bar widget with two additions: a
 public-IPv4 lookup and an in-panel IP settings editor.
 
+## Requirements
+
+- The Quickshell-based Omarchy shell (Quattro)
+- NetworkManager with `nmcli` on `PATH` — used by `settings.py` and by the
+  stock widget's own Wi-Fi list
+- Python 3 (standard library only; no packages to install)
+- `bash`, `awk`, and GNU coreutils
+- `iw` and `ip`, as the stock widget already uses them for link details
+
+No background service, no daemon, and no network access except the public-IP
+lookup, which only runs when you press its button.
+
 ## What this adds over the stock widget
 
 **Public IPv4** — a row that looks the address up through
