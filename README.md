@@ -3,8 +3,6 @@
 A clone of Omarchy's `omarchy.network` bar widget with two additions: a
 public-IPv4 lookup and an in-panel IP settings editor.
 
-![Panel](preview.png)
-
 ## What this adds over the stock widget
 
 **Public IPv4** — a row that looks the address up through
@@ -21,12 +19,26 @@ shortcut that pre-fills from the subnet you are already on.
 ## Install
 
 ```bash
-omarchy plugin add https://github.com/RohiRIK/rohi.network
-omarchy plugin enable rohi.network
+omarchy plugin add https://github.com/RohiRIK/rohi.network --enable
 ```
 
-If you are upgrading from a local clone, remove the old directory first — the
-plugin id is the same, so two copies would both try to own the bar slot.
+The plugin id is `rohi.network`, so it replaces the stock `omarchy.network`
+widget rather than sitting beside it. To go back:
+
+```bash
+omarchy plugin remove rohi.network --yes
+```
+
+Because `manifest.json` records `clonedFrom: omarchy.network`, removing it
+while it is enabled re-enables the stock widget automatically. The old
+directory is kept as a timestamped backup rather than deleted.
+
+If you removed it while it was disabled, the stock widget does not come back
+on its own — enable it:
+
+```bash
+omarchy plugin enable omarchy.network
+```
 
 ## Keys
 
