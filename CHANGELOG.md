@@ -1,5 +1,10 @@
 # Changelog
 
+## Unreleased
+
+- README screenshots of the network panel and IP settings, rendered from the
+  real QML with synthetic data by `tools/render-previews.py`.
+
 ## 0.2.0
 
 - Public IPv4 lookup through ipify.org, on demand only, with the contacting

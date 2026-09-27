@@ -3,6 +3,16 @@
 A clone of Omarchy's `omarchy.network` bar widget with two additions: a
 public-IPv4 lookup and an in-panel IP settings editor.
 
+![IP settings with a manual address filled from the current connection](preview.png)
+
+<table>
+<tr><th>Network panel</th><th>Automatic (DHCP)</th></tr>
+<tr><td><img src="docs/wifi.png" alt="Network panel with demo data"></td><td><img src="docs/ip-dhcp.png" alt="IP settings in DHCP mode with demo data"></td></tr>
+</table>
+
+Screenshots render the actual QML interface with synthetic network names and
+documentation-range addresses.
+
 ## Requirements
 
 - The Quickshell-based Omarchy shell (Quattro)
@@ -89,6 +99,16 @@ bash test/run
 | `test/settings.test.py` | Every validation branch in the save path, against a fake `nmcli`, so no real connection is touched |
 | `test/manifest.test.py` | Manifest schema, entry point, and that the files `Panel.qml` shells out to exist |
 | `test/integration.test.js` | Real `nmcli` and `omarchy-network-band` output on this machine |
+
+To regenerate the screenshots:
+
+```bash
+python3 tools/render-previews.py
+```
+
+It needs the installed Omarchy shell and runs the real `Panel.qml` in an
+isolated offscreen renderer with synthetic data. It never captures your
+desktop, reads NetworkManager, or contacts ipify.org.
 
 ## CI, and why the runner is narrow
 
