@@ -7,6 +7,7 @@ error. These checks fail loudly instead.
 """
 import json
 import os
+import shutil
 import subprocess
 import sys
 import unittest
@@ -51,13 +52,15 @@ class ManifestTests(unittest.TestCase):
     def test_files_the_panel_depends_on_are_present(self):
         # Panel.qml shells out to these; a missing one is a runtime failure
         # that only shows up when the user opens the panel.
-        for name in ('Model.js', 'Panel.qml', 'settings.py'):
+        for name in ('Model.js', 'Panel.qml', 'settings.py', 'preview.png'):
             self.assertTrue(os.path.isfile(os.path.join(ROOT, name)),
                             '%s is missing' % name)
 
 
 class SchemaTests(unittest.TestCase):
     def test_omarchy_plugin_validate_passes(self):
+        if shutil.which('omarchy') is None:
+            self.skipTest('Omarchy is not installed')
         p = subprocess.run(['omarchy', 'plugin', 'validate', ROOT],
                            capture_output=True, text=True)
         self.assertEqual(p.returncode, 0,
