@@ -2,7 +2,13 @@ import ipaddress
 import json
 import subprocess
 import sys
+import urllib.error
 import urllib.request
+
+class NoRedirectHandler(urllib.request.HTTPRedirectHandler):
+    def http_error_302(self, req, fp, code, msg, headers):
+        raise urllib.error.HTTPError(req.full_url, code, f'Unexpected redirect {code}', headers, fp)
+    http_error_301 = http_error_303 = http_error_307 = http_error_308 = http_error_302
 
 def nm(*args):
     p = subprocess.run(['nmcli', '--escape', 'no', *args], capture_output=True, text=True, timeout=20)
@@ -38,7 +44,8 @@ def current_static(uuid):
 def public_ip():
     request = urllib.request.Request('https://api.ipify.org?format=json',
                                      headers={'User-Agent': 'Omarchy-Network-Settings/0.2.0'})
-    with urllib.request.urlopen(request, timeout=8) as response:
+    opener = urllib.request.build_opener(NoRedirectHandler)
+    with opener.open(request, timeout=8) as response:
         data = json.loads(response.read(1024))
     return {'ip': str(ipaddress.IPv4Address(data['ip']))}
 
