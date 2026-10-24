@@ -188,7 +188,7 @@ class PublicIpTests(unittest.TestCase):
             def read(self, n):
                 return json.dumps({'ip': '203.0.113.7'}).encode()
 
-        with mock.patch.object(settings.urllib.request, 'urlopen', lambda *a, **k: FakeResponse()):
+        with mock.patch.object(settings.urllib.request, 'build_opener', lambda *a: mock.Mock(open=lambda *a, **k: FakeResponse())):
             self.assertEqual(settings.public_ip(), {'ip': '203.0.113.7'})
 
     def test_public_ip_rejects_a_non_ipv4_payload(self):
@@ -202,9 +202,26 @@ class PublicIpTests(unittest.TestCase):
             def read(self, n):
                 return json.dumps({'ip': 'not-an-ip'}).encode()
 
-        with mock.patch.object(settings.urllib.request, 'urlopen', lambda *a, **k: FakeResponse()):
+        with mock.patch.object(settings.urllib.request, 'build_opener', lambda *a: mock.Mock(open=lambda *a, **k: FakeResponse())):
             with self.assertRaises(ValueError):
                 settings.public_ip()
+
+    def test_public_ip_refuses_redirects_without_buffering(self):
+        handler = settings.NoRedirectHandler()
+
+        class FakeFp:
+            def read(self, *a):
+                raise AssertionError('Redirect body should never be read')
+
+            def close(self):
+                pass
+
+        req = settings.urllib.request.Request('https://api.ipify.org?format=json')
+        for code in (301, 302, 303, 307, 308):
+            with self.assertRaises(settings.urllib.error.HTTPError) as cm:
+                getattr(handler, f'http_error_{code}')(req, FakeFp(), code, 'Redirect', {'location': 'https://evil.com'})
+            self.assertEqual(cm.exception.code, code)
+            cm.exception.close()
 
 
 if __name__ == '__main__':
